@@ -27,7 +27,7 @@ function App() {
   return (
     <div className="App">
       
-      <div className="">
+      <div className="container">
         <form onSubmit={handleSubmit}>
           <div className="input-group mb-3">
             <input
