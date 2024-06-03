@@ -1,0 +1,71 @@
+name: Build process
+
+on:  
+  push:
+    branches: 
+      - main
+  
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build
+    
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version : [16.x]
+    defaults:
+      run:
+        working-directory: bill-counter
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+      - name: list of files
+        run: ls
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{matrix.node-version}}
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+      - name: Install npm packages        
+        run: npm install
+      - name: Build App        
+        run: npm run build
+      - name: list of files
+        run: ls
+      - name: Upload prod files
+        uses: actions/upload-artifact@v3
+        with:
+          name: production-files
+          path: ./bill-counter/dist
+      - name: list of files
+        run: ls -lrtha dist/*
+
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: production-files
+          path: ./dist
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
