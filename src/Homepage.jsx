@@ -39,7 +39,7 @@ function App() {
               }}
             />
             <div className="input-group-append">
-              <button className="btn btn-dark" type="button">
+              <button className="btn btn-dark" type="submit">
                 Calculate
               </button>
             </div>
